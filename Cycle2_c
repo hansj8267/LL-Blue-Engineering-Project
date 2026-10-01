@@ -1,0 +1,23 @@
+# Gate 2 — Concept Selection
+## L.L. Blue Engineering Capstone Research Challenge | Weeks 5–7
+
+**Status: Cycle 2, Week 5 — just started. Concepts below are initial candidates and will be updated as research continues.**
+
+---
+
+## 1. Recap: What Gate 1 Evidence Tells Us
+
+Our Cycle 1/Gate 1 research produced one concrete, simulation-backed result: running a growing leak at 10 locations across a public benchmark network (WNTR/Net3), against our current 4-sensor set, **9 of 10 locations never crossed the detection threshold within 12 months.** Only the leak closest to an existing sensor was detectable, and only after 7 months.
+
+This result is our starting point for Gate 2. It confirms the Gate 1 hypothesis that observability is a *structural* problem (sensor placement/count), not just an algorithm problem.
+
+---
+
+## 2. Candidate Concepts (Draft — Three So Far)
+
+*These are the concepts we're evaluating as of the start of Cycle 2. This list, the evaluation criteria below, and the leaning in Section 4 are all expected to change as we get further into the gate.*
+
+### **Concept 1 — Sensor-Gap-Guided Placement (Challenge A)**
+Use the blind-spot map itself as the product: for any candidate set of new temporary meter locations (within a fixed rental budget), predict how much of the network's currently-blind area becomes observable. Output is a ranked list of "where to put the next N meters" with an honest coverage-improvement estimate attached.
+
+### ** Concept 2 - upcoming
