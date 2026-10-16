@@ -29,8 +29,6 @@ Use the blind-spot map itself as the product: for any candidate set of new tempo
 2. **Diagnostic-Flag Recovery (Challenge B):** Read HART / NAMUR NE 107 device status flags that SCADA may be discarding, and attach a trust indicator to each existing reading.
 3. **Decline-Shape Classifier (Challenge A/B):** Use the slow, compounding shape of leak-driven pressure decline to tell leaks apart from valve closures, network changes, and normal demand swings, using only existing sensors.
 
-### Current leaning (not final)
-We are leaning toward Concept 1 for now, because it is the only candidate with simulation evidence behind it so far. This is a working direction, not a commitment, and it may change as we confirm assumptions with the sponsor.
 
 ### Starting point from Cycle 1
 Using WNTR/EPANET on the public Net3 network, we modeled a leak whose area grows each month and checked it against a fixed set of 4 sensors. With a 0.5 psi detection threshold and 12 months of simulated growth, **9 of 10 tested leak locations were never detected**.
