@@ -21,3 +21,27 @@ This result is our starting point for Gate 2. It confirms the Gate 1 hypothesis 
 Use the blind-spot map itself as the product: for any candidate set of new temporary meter locations (within a fixed rental budget), predict how much of the network's currently-blind area becomes observable. Output is a ranked list of "where to put the next N meters" with an honest coverage-improvement estimate attached.
 
 ### ** Concept 2 - upcoming
+## Cycle 2 Update (Gate 2: Concept Selection, Weeks 5–7), In Progress
+
+**Status:** Cycle 2 has just started. We are developing candidate concepts one at a time, and they **will be updated** as we get further into the gate.
+
+### Concepts so far
+1. **Sensor-Gap-Guided Placement (Challenge A):** Map where the current sensors cannot see a leak, then rank candidate locations for a small number of temporary clamp-on flow meters by how much of that blind area each one would cover.
+2. *Upcoming*
+3. *Upcoming*
+
+### Starting point from Cycle 1
+Using WNTR/EPANET on the public Net3 network, we modeled a leak whose area grows each month and checked it against a fixed set of 4 sensors. With a 0.5 psi detection threshold and 12 months of simulated growth, **9 of 10 tested leak locations were never detected**.
+
+**Caveats:** This result is specific to Net3 and to assumptions we chose ourselves (sensor locations, leak growth rate, detection threshold). It is not based on sponsor data and has not been validated on a real network.
+
+### Open questions
+- How many clamp-on meters can we rent, and for how long? (sponsor)
+- Do the coverage-gain estimates still hold when we test candidate sensor additions, not just the current sensors?
+
+### Next steps
+- Develop and document the remaining candidate concepts.
+- Extend the Gate 1 simulation to test candidate sensor additions.
+- Compare concepts against agreed criteria before any down-select.
+
+Full writeup: [Cycle2_concept.md](Cycle2_concept.md)
