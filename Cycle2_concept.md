@@ -20,15 +20,17 @@ This result is our starting point for Gate 2. It confirms the Gate 1 hypothesis 
 ### **Concept 1 — Sensor-Gap-Guided Placement (Challenge A)**
 Use the blind-spot map itself as the product: for any candidate set of new temporary meter locations (within a fixed rental budget), predict how much of the network's currently-blind area becomes observable. Output is a ranked list of "where to put the next N meters" with an honest coverage-improvement estimate attached.
 
-### ** Concept 2 - upcoming
 ## Cycle 2 Update (Gate 2: Concept Selection, Weeks 5–7), In Progress
 
-**Status:** Cycle 2 has just started. We are developing candidate concepts one at a time, and they **will be updated** as we get further into the gate.
+**Status:** Cycle 2 has just started. The concepts below are initial candidates and **will be updated** as we get further into the gate.
 
-### Concepts so far
+### Candidate concepts
 1. **Sensor-Gap-Guided Placement (Challenge A):** Map where the current sensors cannot see a leak, then rank candidate locations for a small number of temporary clamp-on flow meters by how much of that blind area each one would cover.
-2. *Upcoming*
-3. *Upcoming*
+2. **Diagnostic-Flag Recovery (Challenge B):** Read HART / NAMUR NE 107 device status flags that SCADA may be discarding, and attach a trust indicator to each existing reading.
+3. **Decline-Shape Classifier (Challenge A/B):** Use the slow, compounding shape of leak-driven pressure decline to tell leaks apart from valve closures, network changes, and normal demand swings, using only existing sensors.
+
+### Current leaning (not final)
+We are leaning toward Concept 1 for now, because it is the only candidate with simulation evidence behind it so far. This is a working direction, not a commitment, and it may change as we confirm assumptions with the sponsor.
 
 ### Starting point from Cycle 1
 Using WNTR/EPANET on the public Net3 network, we modeled a leak whose area grows each month and checked it against a fixed set of 4 sensors. With a 0.5 psi detection threshold and 12 months of simulated growth, **9 of 10 tested leak locations were never detected**.
@@ -37,11 +39,12 @@ Using WNTR/EPANET on the public Net3 network, we modeled a leak whose area grows
 
 ### Open questions
 - How many clamp-on meters can we rent, and for how long? (sponsor)
-- Do the coverage-gain estimates still hold when we test candidate sensor additions, not just the current sensors?
+- Does the sponsor's SCADA integration discard HART / NE 107 diagnostic flags? (sponsor)
+- Can a leak's pressure decline be reliably separated from valve closures and demand changes?
 
 ### Next steps
-- Develop and document the remaining candidate concepts.
 - Extend the Gate 1 simulation to test candidate sensor additions.
-- Compare concepts against agreed criteria before any down-select.
+- Compare the three concepts against agreed criteria before any down-select.
+- Update this section and the full writeup as answers come in.
 
 Full writeup: [Cycle2_concept.md](Cycle2_concept.md)
