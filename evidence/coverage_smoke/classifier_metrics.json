@@ -1,0 +1,53 @@
+{
+  "data_source": "synthetic_only",
+  "seed": 42,
+  "train_count": 28,
+  "test_count": 12,
+  "class_order": [
+    "leak",
+    "valve_closure",
+    "demand_swing",
+    "stable"
+  ],
+  "feature_order": [
+    "total_change",
+    "max_step",
+    "step_ratio",
+    "accel",
+    "c2",
+    "ac7",
+    "range_change"
+  ],
+  "multiclass_accuracy": 0.9166666666666666,
+  "confusion_matrix": [
+    [
+      3,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      3,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      3,
+      0
+    ],
+    [
+      0,
+      1,
+      0,
+      2
+    ]
+  ],
+  "classifier_leak_accuracy": 1.0,
+  "baseline_leak_accuracy": 0.75,
+  "baseline_threshold_psi": "inf",
+  "limitation": "Random holdout of synthetic examples; no sponsor-data validation or calibrated confidence.",
+  "beats_baseline": true
+}

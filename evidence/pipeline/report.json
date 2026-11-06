@@ -1,0 +1,73 @@
+{
+  "run_id": "c91750ef-feca-41fe-938b-c5c09b7bca04",
+  "created_at": "2026-11-06T17:10:31.453022+00:00",
+  "source": "synthetic_demo",
+  "algorithm": "daily-median-trend-v1",
+  "quality": {
+    "input_rows": 12960,
+    "rejected_rows": 0,
+    "duplicate_rows_averaged": 0,
+    "clean_rows": 12960
+  },
+  "configuration": {
+    "days": 90,
+    "min_drop_psi": 1.0,
+    "min_decline_psi_per_30_days": 0.1,
+    "min_coverage": 0.95,
+    "max_gap_hours": 3,
+    "min_psi": 0,
+    "max_psi": 200
+  },
+  "sensors": [
+    {
+      "sensor_id": "synthetic_decline",
+      "coverage": 1.0,
+      "missing_hours": 0,
+      "filled_hours": 0,
+      "longest_gap_hours": 0,
+      "window_start": "2026-08-08T00:00:00+00:00",
+      "window_end_exclusive": "2026-11-06T00:00:00+00:00",
+      "status": "possible_leak_indicator",
+      "drop_psi": 3.451225432182973,
+      "slope_psi_per_30_days": -1.2472811668731318,
+      "trend_r2": 0.9914288258977645,
+      "max_daily_step_psi": 0.1451511523884932,
+      "step_ratio": 0.039434891404161086
+    },
+    {
+      "sensor_id": "synthetic_stable",
+      "coverage": 1.0,
+      "missing_hours": 0,
+      "filled_hours": 0,
+      "longest_gap_hours": 0,
+      "window_start": "2026-08-08T00:00:00+00:00",
+      "window_end_exclusive": "2026-11-06T00:00:00+00:00",
+      "status": "no_sustained_decline_indicator",
+      "drop_psi": -0.00789590441321053,
+      "slope_psi_per_30_days": -0.002305959304802623,
+      "trend_r2": 0.0031107783605404116,
+      "max_daily_step_psi": 0.11849008650568749,
+      "step_ratio": 0.6406473893324013
+    },
+    {
+      "sensor_id": "synthetic_valve_step",
+      "coverage": 1.0,
+      "missing_hours": 0,
+      "filled_hours": 0,
+      "longest_gap_hours": 0,
+      "window_start": "2026-08-08T00:00:00+00:00",
+      "window_end_exclusive": "2026-11-06T00:00:00+00:00",
+      "status": "abrupt_change_review",
+      "drop_psi": 3.984635818900614,
+      "slope_psi_per_30_days": -1.9124892257852146,
+      "trend_r2": 0.7201213200116237,
+      "max_daily_step_psi": 4.032876032405525,
+      "step_ratio": 0.9747023913060788
+    }
+  ],
+  "limitation": "Screening indicators only; pressure alone does not establish a leak or its location.",
+  "llm": {
+    "status": "disabled",
+    "text": "LLM disabled; review deterministic indicators in the report."
+  }
+}

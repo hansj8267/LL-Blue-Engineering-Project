@@ -1,0 +1,21 @@
+{
+  "new_sites": [
+    "601"
+  ],
+  "train_leaks": [
+    "171",
+    "103"
+  ],
+  "held_out_leaks": [
+    "205",
+    "225"
+  ],
+  "train": {
+    "before_blind_fraction": 1.0,
+    "after_blind_fraction": 0.0
+  },
+  "held_out": {
+    "before_blind_fraction": 1.0,
+    "after_blind_fraction": 0.0
+  }
+}
