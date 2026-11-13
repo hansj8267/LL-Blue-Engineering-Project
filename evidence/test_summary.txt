@@ -1,3 +1,10 @@
+test_bad_threshold_file_rejected (test_evaluation.EvaluationTests.test_bad_threshold_file_rejected) ... ok
+test_choose_respects_budget_and_falls_back_to_balance (test_evaluation.EvaluationTests.test_choose_respects_budget_and_falls_back_to_balance) ... ok
+test_cli_outputs_feed_pipeline (test_evaluation.EvaluationTests.test_cli_outputs_feed_pipeline) ... ok
+test_delay_measured_from_onset (test_evaluation.EvaluationTests.test_delay_measured_from_onset) ... ok
+test_refactor_matches_pipeline_aggregation (test_evaluation.EvaluationTests.test_refactor_matches_pipeline_aggregation) ... ok
+test_score_counts_flags_by_class (test_evaluation.EvaluationTests.test_score_counts_flags_by_class) ... ok
+test_sweep_separates_easy_synthetic_classes (test_evaluation.EvaluationTests.test_sweep_separates_easy_synthetic_classes) ... ok
 test_all_invalid_sensor_is_visible (test_pipeline.PipelineTests.test_all_invalid_sensor_is_visible) ... ok
 test_database_and_identifiers (test_pipeline.PipelineTests.test_database_and_identifiers) ... ok
 test_end_to_end_and_append_only_results (test_pipeline.PipelineTests.test_end_to_end_and_append_only_results) ... ok
@@ -10,6 +17,6 @@ test_short_data_and_future_end (test_pipeline.PipelineTests.test_short_data_and_
 test_validation_duplicates_and_timezone (test_pipeline.PipelineTests.test_validation_duplicates_and_timezone) ... ok
 
 ----------------------------------------------------------------------
-Ran 10 tests in 1.084s
+Ran 17 tests in 1.513s
 
 OK

@@ -98,6 +98,45 @@ Architecture:
 | `analyze` / `trend_indicators` | Deterministic screening with auditable numerical evidence |
 | `llm_summary` | Optional explanation of aggregate evidence; explicit success/error/disabled status |
 | JSON + result tables | Reviewable output and append-only run history |
+| `detector_evaluation.py` | LLB-13 benchmark, threshold calibration, and detection-delay study |
+
+## LLB-13: detector benchmark and threshold calibration
+
+The LLB-12 thresholds were demonstrative. `detector_evaluation.py` measures the same rules
+(`daily_trend_metrics` + `trend_status`, shared with the pipeline) on labeled synthetic windows:
+leaks, valve closures, demand swings, and stable supply (generator from `leak_toolkit_working.py`).
+
+```powershell
+.venv\Scripts\python.exe detector_evaluation.py --max-false-alarm 0.05
+.venv\Scripts\python.exe pressure_pipeline.py analyze --thresholds results/evaluation/recommended_thresholds.json
+```
+
+1. **Benchmark:** confusion table by class, leak recall, false-alarm rate (overall and per class), precision.
+2. **Calibration:** sweeps `min_drop` × `min_slope` on a calibration split. It keeps the pair with the highest recall
+   within the false-alarm budget and re-scores that pair on a separate test split. If nothing fits the budget, it
+   picks the best recall minus false-alarm pair and reports `constraint_met: false`.
+3. **Detection delay:** slides the 90-day window one day at a time over 270-day series with a known leak onset.
+   It reports days from onset to first flag, flags raised before onset, and how often a stable sensor is ever flagged.
+
+Outputs in `results/evaluation/`: `evaluation_report.json`, `threshold_sweep.csv`, `threshold_tradeoff.png`,
+and `recommended_thresholds.json`. Pass that last file to the pipeline with `--thresholds`. Explicit `--min-drop` /
+`--min-slope` flags still win. `report.json` records the source of each threshold under
+`configuration.threshold_source`.
+
+Findings at seed 42 (synthetic only; see `evidence/evaluation/`):
+
+| Thresholds | Leak recall | False alarms | Valve closures flagged | Rolling: median delay | Stable sensor ever flagged |
+|---|---|---|---|---|---|
+| Defaults (1 psi, 0.1 psi/30 d) | 1.00 | 0.30 | 0.65 | 32.5 days | 0.97 |
+| Recommended (1 psi, 0.5 psi/30 d) | 0.94 | 0.27 | 0.65 | 61 days | 0.27 |
+
+- With the defaults, daily screening flags nearly every stable sensor at some point. The recommended slope
+  cuts that to about a quarter and lowers demand-swing alarms from 0.21 to 0.15, at the cost of roughly a month of extra detection delay.
+- No swept pair meets a 5% false-alarm budget. Gradual valve closures produce the same decline shape as a leak,
+  and trend thresholds cannot separate them. This is quantitative support for Concept C (shape classifier,
+  `leak_toolkit_working.py`) and for checking valve and operating records before acting on an indicator.
+- These rates come from our own synthetic assumptions. They are not field accuracy. Rerun the calibration
+  when sponsor-labelled events are available.
 
 ## Completed research toolkit
 

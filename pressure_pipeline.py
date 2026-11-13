@@ -122,33 +122,66 @@ def hourly_window(group, days=90, max_gap_hours=3, end=None):
     }
 
 
-def trend_indicators(series, min_drop=1.0, min_slope=0.1):
+DEFAULT_MIN_DROP = 1.0      # psi, first-week minus last-week daily median
+DEFAULT_MIN_SLOPE = 0.1     # psi per 30 days of sustained decline
+ABRUPT_STEP_RATIO = 0.6     # share of the window range explained by one daily step
+
+
+def daily_trend_metrics(daily):
+    """Threshold-independent evidence from complete daily medians (psi).
+
+    Kept separate from trend_status so calibration can sweep thresholds
+    without recomputing fits (see detector_evaluation.py).
+    """
+    y = np.asarray(daily, dtype=float)
+    if len(y) < 14 or not np.isfinite(y).all():
+        raise ValueError("Need >=14 complete finite daily values")
+    x = np.arange(len(y), dtype=float)
+    slope, intercept = np.polyfit(x, y, 1)
+    residual = y - (slope * x + intercept)
+    total = float(np.sum((y - y.mean()) ** 2))
+    step = float(np.max(np.abs(np.diff(y))))
+    spread = float(np.ptp(y))
+    return {
+        "drop_psi": float(y[:7].mean() - y[-7:].mean()),
+        "slope_psi_per_30_days": float(slope * 30),
+        "trend_r2": float(1 - np.sum(residual ** 2) / total) if total > 1e-8 else 0.0,
+        "max_daily_step_psi": step,
+        "step_ratio": step / spread if spread > 1e-8 else 0.0,
+    }
+
+
+def trend_status(metrics, min_drop=DEFAULT_MIN_DROP, min_slope=DEFAULT_MIN_SLOPE):
+    """Screening rule applied to daily_trend_metrics output; no causal claim."""
+    abrupt = metrics["step_ratio"] >= ABRUPT_STEP_RATIO and metrics["max_daily_step_psi"] >= min_drop
+    candidate = metrics["drop_psi"] >= min_drop and metrics["slope_psi_per_30_days"] <= -min_slope
+    return "abrupt_change_review" if abrupt else "possible_leak_indicator" if candidate else "no_sustained_decline_indicator"
+
+
+def trend_indicators(series, min_drop=DEFAULT_MIN_DROP, min_slope=DEFAULT_MIN_SLOPE):
     """Daily medians suppress diurnal cycles; OLS slope uses 30-day months.
 
     No causal attribution or calibrated probability is implied by these rules.
     """
     daily = pd.Series(series.to_numpy()).groupby(np.arange(len(series)) // 24).median()
-    y = daily.to_numpy()
-    x = np.arange(len(y), dtype=float)
-    slope, intercept = np.polyfit(x, y, 1)
-    residual = y - (slope * x + intercept)
-    total = float(np.sum((y - y.mean()) ** 2))
-    drop = float(y[:7].mean() - y[-7:].mean())
-    step = float(np.max(np.abs(np.diff(y))))
-    spread = float(np.ptp(y))
-    step_ratio = step / spread if spread > 1e-8 else 0.0
-    candidate = drop >= min_drop and slope * 30 <= -min_slope
-    abrupt = step_ratio >= 0.6 and step >= min_drop
-    status = "abrupt_change_review" if abrupt else "possible_leak_indicator" if candidate else "no_sustained_decline_indicator"
-    return {
-        "status": status, "drop_psi": drop, "slope_psi_per_30_days": float(slope * 30),
-        "trend_r2": float(1 - np.sum(residual ** 2) / total) if total > 1e-8 else 0.0,
-        "max_daily_step_psi": step, "step_ratio": step_ratio,
-    }
+    metrics = daily_trend_metrics(daily.to_numpy())
+    return {"status": trend_status(metrics, min_drop, min_slope), **metrics}
+
+
+def load_thresholds(path):
+    """Read a calibration file written by detector_evaluation.py."""
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    try:
+        drop, slope = float(data["min_drop_psi"]), float(data["min_decline_psi_per_30_days"])
+    except (KeyError, TypeError, ValueError):
+        raise ValueError("Threshold file needs numeric min_drop_psi and min_decline_psi_per_30_days") from None
+    if not np.isfinite([drop, slope]).all() or drop <= 0 or slope <= 0:
+        raise ValueError("Thresholds must be positive and finite")
+    return drop, slope, str(data.get("data_source", "unspecified"))
 
 
 def analyze(clean, days=90, min_coverage=0.95, max_gap_hours=3,
-            min_drop=1.0, min_slope=0.1, end=None):
+            min_drop=DEFAULT_MIN_DROP, min_slope=DEFAULT_MIN_SLOPE, end=None):
     if not 0 < min_coverage <= 1 or min_drop <= 0 or min_slope <= 0:
         raise ValueError("Coverage must be in (0,1]; thresholds must be positive")
     if clean.empty:
@@ -230,13 +263,28 @@ def main(argv=None):
     ap.add_argument("--min-coverage", type=float, default=0.95)
     ap.add_argument("--min-psi", type=float, default=0)
     ap.add_argument("--max-psi", type=float, default=200)
-    ap.add_argument("--min-drop", type=float, default=1.0)
-    ap.add_argument("--min-slope", type=float, default=0.1)
+    ap.add_argument("--min-drop", type=float, default=None,
+                    help=f"psi; overrides --thresholds (default {DEFAULT_MIN_DROP})")
+    ap.add_argument("--min-slope", type=float, default=None,
+                    help=f"psi per 30 days; overrides --thresholds (default {DEFAULT_MIN_SLOPE})")
+    ap.add_argument("--thresholds", help="JSON from detector_evaluation.py (recommended_thresholds.json)")
     ap.add_argument("--llm", choices=["off", "openai"], default=os.getenv("LLM_MODE", "off"))
     ap.add_argument("--out", default="results/pipeline")
     a = ap.parse_args(argv)
     if a.days < 14 or a.max_gap_hours < 0:
         ap.error("--days must be >=14; --max-gap-hours must be >=0")
+    file_drop = file_slope = None
+    if a.thresholds:
+        file_drop, file_slope, file_origin = load_thresholds(a.thresholds)
+    threshold_source = {
+        "min_drop": "cli" if a.min_drop is not None else "file" if a.thresholds else "default",
+        "min_slope": "cli" if a.min_slope is not None else "file" if a.thresholds else "default",
+    }
+    if a.thresholds:
+        threshold_source["file"] = Path(a.thresholds).name
+        threshold_source["file_data_source"] = file_origin
+    a.min_drop = a.min_drop if a.min_drop is not None else file_drop if file_drop is not None else DEFAULT_MIN_DROP
+    a.min_slope = a.min_slope if a.min_slope is not None else file_slope if file_slope is not None else DEFAULT_MIN_SLOPE
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     with Database(a.db) as db:
@@ -286,7 +334,8 @@ def main(argv=None):
             "algorithm": "daily-median-trend-v1", "quality": audit,
             "configuration": {"days": a.days, "min_drop_psi": a.min_drop,
                 "min_decline_psi_per_30_days": a.min_slope, "min_coverage": a.min_coverage,
-                "max_gap_hours": a.max_gap_hours, "min_psi": a.min_psi, "max_psi": a.max_psi},
+                "max_gap_hours": a.max_gap_hours, "min_psi": a.min_psi, "max_psi": a.max_psi,
+                "threshold_source": threshold_source},
             "sensors": results,
             "limitation": "Screening indicators only; pressure alone does not establish a leak or its location.",
         }
