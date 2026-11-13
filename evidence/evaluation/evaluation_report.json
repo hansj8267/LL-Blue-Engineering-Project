@@ -1,0 +1,114 @@
+{
+  "data_source": "synthetic_only",
+  "seed": 42,
+  "algorithm": "daily-median-trend-v1",
+  "configuration": {
+    "window_days": 90,
+    "sigma_psi": 0.25,
+    "drop_range_psi": [
+      2.0,
+      8.0
+    ],
+    "windows_per_class_per_split": 100,
+    "max_false_alarm": 0.05,
+    "delay_series": 30,
+    "delay_total_days": 270,
+    "delay_onset_day": 90,
+    "step_days": 1
+  },
+  "default_thresholds_test": {
+    "min_drop_psi": 1.0,
+    "min_decline_psi_per_30_days": 0.1,
+    "leak_recall": 1.0,
+    "false_alarm_rate": 0.3,
+    "precision": 0.5263157894736842,
+    "false_alarm_rate_by_class": {
+      "valve_closure": 0.65,
+      "demand_swing": 0.21,
+      "stable": 0.04
+    },
+    "confusion": {
+      "leak": {
+        "possible_leak_indicator": 100,
+        "abrupt_change_review": 0,
+        "no_sustained_decline_indicator": 0
+      },
+      "valve_closure": {
+        "possible_leak_indicator": 65,
+        "abrupt_change_review": 7,
+        "no_sustained_decline_indicator": 28
+      },
+      "demand_swing": {
+        "possible_leak_indicator": 21,
+        "abrupt_change_review": 0,
+        "no_sustained_decline_indicator": 79
+      },
+      "stable": {
+        "possible_leak_indicator": 4,
+        "abrupt_change_review": 1,
+        "no_sustained_decline_indicator": 95
+      }
+    }
+  },
+  "recommended_thresholds": {
+    "min_drop_psi": 1.0,
+    "min_decline_psi_per_30_days": 0.5,
+    "constraint_met": false,
+    "selection": "budget_unmet_max_recall_minus_false_alarm"
+  },
+  "recommended_thresholds_test": {
+    "min_drop_psi": 1.0,
+    "min_decline_psi_per_30_days": 0.5,
+    "leak_recall": 0.94,
+    "false_alarm_rate": 0.26666666666666666,
+    "precision": 0.5402298850574713,
+    "false_alarm_rate_by_class": {
+      "valve_closure": 0.65,
+      "demand_swing": 0.15,
+      "stable": 0.0
+    },
+    "confusion": {
+      "leak": {
+        "possible_leak_indicator": 94,
+        "abrupt_change_review": 0,
+        "no_sustained_decline_indicator": 6
+      },
+      "valve_closure": {
+        "possible_leak_indicator": 65,
+        "abrupt_change_review": 7,
+        "no_sustained_decline_indicator": 28
+      },
+      "demand_swing": {
+        "possible_leak_indicator": 15,
+        "abrupt_change_review": 0,
+        "no_sustained_decline_indicator": 85
+      },
+      "stable": {
+        "possible_leak_indicator": 0,
+        "abrupt_change_review": 1,
+        "no_sustained_decline_indicator": 99
+      }
+    }
+  },
+  "detection_delay": {
+    "default": {
+      "leak_series": 30,
+      "detected_fraction": 1.0,
+      "median_delay_days": 32.5,
+      "p90_delay_days": 60.1,
+      "pre_onset_flag_fraction": 0.03333333333333333,
+      "stable_series": 30,
+      "stable_series_ever_flagged_fraction": 0.9666666666666667
+    },
+    "recommended": {
+      "leak_series": 30,
+      "detected_fraction": 1.0,
+      "median_delay_days": 61.0,
+      "p90_delay_days": 97.0,
+      "pre_onset_flag_fraction": 0.0,
+      "stable_series": 30,
+      "stable_series_ever_flagged_fraction": 0.26666666666666666
+    }
+  },
+  "limitation": "Synthetic scenarios with assumed noise, leak growth, valve and demand behavior. Rates are not field accuracy or calibrated probabilities; recalibrate on sponsor-labelled events."
+}

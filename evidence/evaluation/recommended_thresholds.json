@@ -1,0 +1,11 @@
+{
+  "min_drop_psi": 1.0,
+  "min_decline_psi_per_30_days": 0.5,
+  "constraint_met": false,
+  "selection": "budget_unmet_max_recall_minus_false_alarm",
+  "max_false_alarm": 0.05,
+  "window_days": 90,
+  "seed": 42,
+  "source": "detector_evaluation.py",
+  "data_source": "synthetic_only"
+}
